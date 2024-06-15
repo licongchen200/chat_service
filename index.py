@@ -1,6 +1,6 @@
 from flask import Flask, request
-from lib.db import get_user, get_message
-
+from src.chat import get_message
+from src.user import get_user
 app = Flask(__name__)
 
 
@@ -21,4 +21,4 @@ def message():
     return get_message(id, count)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8080, host='0.0.0.0')
+    app.run(debug=True, port=8081, host='0.0.0.0')
