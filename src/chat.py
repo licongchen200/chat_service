@@ -1,8 +1,10 @@
 from lib.conn import get_connection
 import datetime
 import json
+from flask import jsonify
 
-def send_message(sender, receiver, content, status = "", is_group = False):
+
+def send_message(sender, receiver, content, status="", is_group=False):
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -10,9 +12,11 @@ def send_message(sender, receiver, content, status = "", is_group = False):
         user_data = (sender, receiver, content, datetime.datetime.now(), status, is_group)
         cursor.execute(insert_query, user_data)
         conn.commit()
-        print("message sent")
-    except:
-        print("error sending message")
+        return jsonify(user_data), 201
+    except Exception as e:
+        return jsonify({"error": f"message: {e}"})
+
+
 # send_message(3, 1, "Hi")
 
 
@@ -30,16 +34,16 @@ def get_message(user_id, count):
                 "sender": row[0],
                 "receiver": row[1],
                 "content": row[2],
-                "ts":row[3].isoformat()
+                "ts": row[3].isoformat()
             }
             messages.append(message)
         print(json.dumps(messages, indent=4))
         return json.dumps(messages)
     except Exception as e:
         print(f"failed: {e}")
-        return json.dumps({"error": "failed to retrieve messages"})
+        return jsonify({"error": f"message: {e}"})
 
-# get_message(1, 6)
+
 
 def delete_message(id):
     try:
@@ -49,7 +53,8 @@ def delete_message(id):
         delete_data = (id,)
         cursor.execute(delete_query, delete_data)
         conn.commit()
-        print("success")
-    except:
-        print("failed to delete")
-delete_message(6)
+        return jsonify({"status": "success"})
+    except Exception as e:
+        return jsonify({"error": f"message: {e}"})
+
+
