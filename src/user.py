@@ -55,3 +55,21 @@ def delete_user(id):
         data = {"error": f"message: {e}"}
         return jsonify(data)
 # delete_user(5)
+
+
+def sign_in(email, password):
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users where (email = %s or first_name = %s) and password_hash = %s', (email, email, password))
+        user = cursor.fetchall()
+        if len(user) == 1:
+            print(1)
+            return jsonify({'status':'signed_in'})
+        return jsonify({'error':'password and email incorrect'})
+    except Exception as e:
+        data = {"error": f"message: {e}"}
+        return jsonify(data)
+
+# print(sign_in('hubert@gmail.com', 'abcd'))
+

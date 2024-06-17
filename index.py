@@ -1,6 +1,6 @@
 from flask import Flask, request
 from src.chat import get_message, send_message, delete_message
-from src.user import get_user, create_user, delete_user
+from src.user import get_user, create_user, delete_user, sign_in
 app = Flask(__name__)
 
 
@@ -36,6 +36,11 @@ def my_message():
         id = request.args.get("id", default = None, type = int)
         return delete_message(id)
 
+@app.route('/signin', methods = ['POST'])
+def my_signin():
+    if request.method == "POST":
+        body = request.get_json()
+        return sign_in(body['email'], body['password'])
 
 
 if __name__ == "__main__":
