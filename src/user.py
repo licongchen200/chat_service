@@ -27,14 +27,14 @@ def get_user():
 
 # get_user()
 
-def create_user(email, firstname, lastname, password):
+def create_user(email, firstname, lastname, password, username):
     try:
         conn = get_connection()
         cursor = conn.cursor()
         hashed_bytes = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         hashed = hashed_bytes.decode('utf-8')
-        insert_query = "INSERT INTO users (email, first_name, last_name, password_hash) VALUES (%s, %s, %s, %s)"
-        user_data = (email, firstname, lastname, hashed)
+        insert_query = "INSERT INTO users (email, first_name, last_name, password_hash, username) VALUES (%s, %s, %s, %s, %s)"
+        user_data = (email, firstname, lastname, hashed, username)
         cursor.execute(insert_query, user_data)
         conn.commit()
         return jsonify(user_data), 201
@@ -64,7 +64,7 @@ def sign_in(email, password):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT password_hash FROM users where (email = %s or first_name = %s)', (email, email))
+        cursor.execute('SELECT password_hash FROM users where (email = %s or username = %s)', (email, email))
         user = cursor.fetchall()
         if len(user) == 1:
             hashed_password = user[0][0].encode('utf-8')
