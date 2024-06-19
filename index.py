@@ -16,7 +16,7 @@ def my_user():
         return get_user()
     elif request.method == 'POST':
         user = request.get_json()
-        return create_user(user["email"], user["firstname"], user["lastname"], user["password"])
+        return create_user(user["email"], user["firstname"], user["lastname"], user["password"], user["username"])
     elif request.method == 'DELETE':
         id = request.args.get("id", default=None, type=int)
         return delete_user(id)
