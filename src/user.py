@@ -1,6 +1,7 @@
 from lib.conn import get_connection
 from flask import jsonify
 import datetime
+import bcrypt
 import json
 
 
@@ -30,8 +31,10 @@ def create_user(email, firstname, lastname, password):
     try:
         conn = get_connection()
         cursor = conn.cursor()
+        hashed_bytes = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        hashed = hashed_bytes.decode('utf-8')
         insert_query = "INSERT INTO users (email, first_name, last_name, password_hash) VALUES (%s, %s, %s, %s)"
-        user_data = (email, firstname, lastname, password)
+        user_data = (email, firstname, lastname, hashed)
         cursor.execute(insert_query, user_data)
         conn.commit()
         return jsonify(user_data), 201
@@ -61,15 +64,16 @@ def sign_in(email, password):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users where (email = %s or first_name = %s) and password_hash = %s', (email, email, password))
+        cursor.execute('SELECT password_hash FROM users where (email = %s or first_name = %s)', (email, email))
         user = cursor.fetchall()
         if len(user) == 1:
-            print(1)
-            return jsonify({'status':'signed_in'})
+            hashed_password = user[0][0].encode('utf-8')
+            if bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+                return jsonify({'status':'signed_in'})
         return jsonify({'error':'password and email incorrect'})
     except Exception as e:
         data = {"error": f"message: {e}"}
         return jsonify(data)
 
-# print(sign_in('hubert@gmail.com', 'abcd'))
+# print(sign_in('abc@gmail.com', '1234'))
 
