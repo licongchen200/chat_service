@@ -2,6 +2,8 @@ from lib.conn import get_connection
 from flask import jsonify
 import json
 import datetime
+
+
 def get_request(user_id):
     try:
         conn = get_connection()
@@ -36,6 +38,7 @@ def send_request(user_id, friend_id):
     except Exception as e:
         return jsonify({"error": f"message: {e}"})
 
+
 def decline(id):
     conn = get_connection()
     cursor = conn.cursor()
@@ -43,7 +46,8 @@ def decline(id):
     delete_data = (id,)
     cursor.execute(delete_query, delete_data)
     conn.commit()
-    return jsonify({"status": "request declined success fully"})
+    return json.dumps({"status": "request declined success fully"})
+
 
 def accept(id):
     try:
@@ -60,7 +64,7 @@ def accept(id):
         delete_data = (id,)
         cursor.execute(delete_query, delete_data)
         conn.commit()
-        jsonify({'status':'request accepted'})
+        return jsonify({'status':'request accepted'})
     except Exception as e:
         return jsonify({"error": f"message: {e}"})
-accept(2)
+# accept(2)
